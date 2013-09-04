@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>VPS NAT Ports Forwarding</title>
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    
+    <script src="lib/jquery/jquery-2.0.2.min.js"></script>
+    <script src="lib/jquery/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="lib/angular/angular.min.js"></script>
+    <script src="lib/angular/angular-resource.min.js"></script>
+
+    <script src="js/ui.js"></script>
+    <script src="js/list.js"></script>
+    <script src="js/listApp2.js"></script>
+
+</head>
+<body ng-app="listApp">
+    <div class="list" ng-controller="MyCtrlLang">
+        <h4>Многоязычные поля</h4>
+	<button class="btn" ng-click="add('before')">Добавить в начало</button><br/><br/>
+        <ul class="unstyled" ng-model="items">
+            <li class="list-item" ng-repeat="item in items">
+                <div class="list-item-port">
+                    <label>
+			From<input type="text" ng-model="item.port_from" ng-blur="save($index)" ng-keyup="keyup($index)" />
+                    </label>
+                    <label>
+			To<input type="text" ng-model="item.port_to" ng-blur="save($index)" ng-keyup="keyup($index)" />
+                    </label>
+                </div>
+                <div class="list-item-delete" ng-hide="$last"><button type="button" class="close" ng-click="del($index)">&times;</button></div>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>
