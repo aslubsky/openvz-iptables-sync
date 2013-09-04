@@ -3,7 +3,7 @@
 /* App Module */
 
 
-angular.module('listApp', ['ngResource', 'ui.sortable', 'ui.filters', 'ui.focusblur', 'oi.list'])
+angular.module('listApp', ['ngResource', 'ui.filters', 'ui.focusblur', 'oi.list'])
 
     //Создание ресурсов
     

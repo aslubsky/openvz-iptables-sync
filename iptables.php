@@ -16,17 +16,14 @@ $str = array();
 $portsFwd = DbAPI::getPorts();
 $identity = null;
 foreach($portsFwd as $portFwd) {
-    if($identity != $portFwd['identity']) {
-        $str []= "\n".'## VPS '.$portFwd['identity'];
+    if($identity != $portFwd['node_id']) {
+        $str []= "\n".'## VPS '.$portFwd['node_id'];
     }
     $str []= sprintf(
         '/sbin/iptables -t nat -A PREROUTING -p %s -d %s --dport %s -i %s -j DNAT --to-destination %s:%s',
         $portFwd['proto'], $wanIP, $portFwd['port_from'], $wanIF, $portFwd['port_to'], $portFwd['ip_address']
     );
-    if($identity != $portFwd['identity']) {
-//        $str []= "\n";
-    }
-    $identity = $portFwd['identity'];
+    $identity = $portFwd['node_id'];
 }
 file_put_contents(SITE_DIR.'/all', implode("\n", $str));
 

@@ -23,6 +23,7 @@
         <ul class="unstyled" ng-model="items">
             <li class="list-item" ng-repeat="item in items">
                 <div class="list-item-port">
+					<input type="hidden" ng-model="item.node_id" />
                     <label>
 			From<input type="text" ng-model="item.port_from" ng-blur="save($index)" ng-keyup="keyup($index)" />
                     </label>

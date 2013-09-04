@@ -15,14 +15,14 @@ class DbAPI
 
     private static function _create()
     {
-        self::exec('CREATE TABLE nodes (identity INTEGER PRIMARY KEY, ip_address TEXT, need_sync NUMERIC)');
-        self::exec('CREATE TABLE nodes_ports (identity NUMERIC, port_from NUMERIC, port_to NUMERIC, proto TEXT)');
+        self::exec('CREATE TABLE nodes (id INTEGER PRIMARY KEY, ip_address TEXT, need_sync NUMERIC)');
+        self::exec('CREATE TABLE nodes_ports (id INTEGER PRIMARY KEY AUTOINCREMENT, node_id NUMERIC, port_from NUMERIC, port_to NUMERIC, proto TEXT)');
     }
 
     public static function hasNode($identity)
     {
         $res = self::fetch(
-            sprintf("SELECT COUNT(*) as cnt FROM nodes WHERE identity = %s", (int)$identity)
+            sprintf("SELECT COUNT(*) as cnt FROM nodes WHERE id = %s", (int)$identity)
         );
         return (int)$res['cnt'] > 0;
     }
@@ -36,26 +36,43 @@ class DbAPI
     public static function addNode($nodeArr)
     {
         self::exec(
-            sprintf("INSERT INTO nodes (identity, ip_address, need_sync) VALUES(%s, '%s', 1)", (int)$nodeArr['identity'], $nodeArr['ip_address'])
+            sprintf("INSERT INTO nodes (id, ip_address, need_sync) VALUES(%s, '%s', 1)", (int)$nodeArr['identity'], $nodeArr['ip_address'])
         );
     }
 
-    public static function forwardNodePort($identity, $from, $to, $proto = 'tcp')
+    public static function forwardNodePort($nodeId, $from, $to, $proto = 'tcp')
     {
-        self::exec(
-            sprintf("INSERT INTO nodes_ports (identity, port_from, port_to, proto) VALUES(%s, %s, %s, '%s')",
-                (int)$identity, $from, $to, $proto)
+        $res = self::exec(
+            sprintf("INSERT INTO nodes_ports (node_id, port_from, port_to, proto) VALUES(%s, %s, %s, '%s')",
+                (int)$nodeId, $from, $to, $proto)
         );
+//print_r($res);exit;
         self::exec(
-            sprintf("UPDATE nodes SET need_sync = 1 WHERE identity = %s", (int)$identity)
+            sprintf("UPDATE nodes SET need_sync = 1 WHERE id = %s", (int)$nodeId)
         );
+		return $res;
     }
 
     public static function getPorts()
     {
-        return self::fetchAll("SELECT np.*,n.ip_address FROM nodes_ports np INNER JOIN nodes n ON n.identity = np.identity ORDER BY np.identity");
+        return self::fetchAll("SELECT np.*,n.ip_address FROM nodes_ports np INNER JOIN nodes n ON n.id = np.node_id ORDER BY np.node_id");
     }
 
+    public static function updatePortsFwd($id, $from, $to, $proto = 'tcp')
+    {
+        self::exec(
+			sprintf("UPDATE nodes_ports SET port_from = %s, port_to = %s, proto = '%s' WHERE id = %s",  $from, $to, $proto, (int)$id)
+		);
+		self::exec(
+            sprintf("UPDATE nodes SET need_sync = 1 WHERE id = (SELECT node_id FROM nodes_ports WHERE id=%s)", (int)$id)
+        );
+    }
+/*
+    public static function getPorts()
+    {
+        return self::fetchAll("SELECT np.*,n.ip_address FROM nodes_ports np INNER JOIN nodes n ON n.id = np.node_id ORDER BY np.node_id");
+    }
+*/
     public static function exec($q)
     {
         return self::$conn->exec($q);
