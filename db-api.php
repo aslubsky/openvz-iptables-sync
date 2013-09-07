@@ -19,10 +19,10 @@ class DbAPI
         self::exec('CREATE TABLE nodes_ports (id INTEGER PRIMARY KEY AUTOINCREMENT, node_id NUMERIC, port_from NUMERIC, port_to NUMERIC, proto TEXT)');
     }
 
-    public static function hasNode($identity)
+    public static function hasNode($id)
     {
         $res = self::fetch(
-            sprintf("SELECT COUNT(*) as cnt FROM nodes WHERE id = %s", (int)$identity)
+            sprintf("SELECT COUNT(*) as cnt FROM nodes WHERE id = %s", (int)$id)
         );
         return (int)$res['cnt'] > 0;
     }
@@ -50,12 +50,18 @@ class DbAPI
         self::exec(
             sprintf("UPDATE nodes SET need_sync = 1 WHERE id = %s", (int)$nodeId)
         );
-		return $res;
+        $id = self::$conn->lastInsertId();
+        //echo $id;exit;
+		return self::fetch(
+            sprintf("SELECT * FROM nodes_ports WHERE id = %s", (int)$id)
+        );
     }
 
-    public static function getPorts()
+    public static function getPorts($nodeId = null)
     {
-        return self::fetchAll("SELECT np.*,n.ip_address FROM nodes_ports np INNER JOIN nodes n ON n.id = np.node_id ORDER BY np.node_id");
+        return self::fetchAll("SELECT np.*,n.ip_address FROM nodes_ports np INNER JOIN nodes n ON n.id = np.node_id ".
+			($nodeId ? 'WHERE n.id = '.$nodeId : '').
+			" ORDER BY np.node_id");
     }
 
     public static function updatePortsFwd($id, $from, $to, $proto = 'tcp')
@@ -67,12 +73,22 @@ class DbAPI
             sprintf("UPDATE nodes SET need_sync = 1 WHERE id = (SELECT node_id FROM nodes_ports WHERE id=%s)", (int)$id)
         );
     }
-/*
-    public static function getPorts()
+
+    public static function deletePortsFwd($id)
     {
-        return self::fetchAll("SELECT np.*,n.ip_address FROM nodes_ports np INNER JOIN nodes n ON n.id = np.node_id ORDER BY np.node_id");
+		self::exec(
+            sprintf("UPDATE nodes SET need_sync = 1 WHERE id = (SELECT node_id FROM nodes_ports WHERE id=%s)", (int)$id)
+        );
+        self::exec(
+			sprintf("DELETE FROM nodes_ports WHERE id = %s",  (int)$id)
+		);
     }
-*/
+
+    public static function getNodes()
+    {
+        return self::fetchAll("SELECT * FROM nodes");
+    }
+
     public static function exec($q)
     {
         return self::$conn->exec($q);
@@ -80,6 +96,7 @@ class DbAPI
 
     public static function fetchAll($q)
     {
+		//echo $q."\n";
         $sth = self::$conn->prepare($q);
         $sth->setFetchMode(PDO::FETCH_ASSOC);
         $sth->execute();
