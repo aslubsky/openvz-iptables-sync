@@ -26,6 +26,12 @@
 	                <label class="span2">
 						To<input  class="span1" type="text" ng-model="port.port_to" ng-change="save(port)"/>
 	                </label>
+	                <label class="span2">
+						Proto<select  class="span1" ng-model="port.proto" ng-change="save(port)">
+                        <option value="tcp">TCP</option>
+                        <option value="udp">UDP</option>
+                        </select>
+	                </label>
 		            <button type="button" class="close" ng-click="del(node.id, port.id, $index)">&times;</button>
 		        </li>
 		    </ul>
