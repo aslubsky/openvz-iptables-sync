@@ -5,11 +5,11 @@ require_once SITE_DIR .'/openvz-panel-api.php';
 require_once SITE_DIR .'/db-api.php';
 
 $user = 'admin';
-$password = '******';
-$host = 'xx.xx.xx.xx';
+$password = 'gfhjkm666';
+$host = '144.76.91.146';
 OpenVZPanelAPI::init($user, $password, $host);
 
-DbAPI::init(SITE_DIR.'/openvz-iptables.db');
+DbAPI::init(SITE_DIR.'/db/openvz-iptables.db');
 //exit('O_o');
 
 $nodes = OpenVZPanelAPI::getVirtualServers(1);

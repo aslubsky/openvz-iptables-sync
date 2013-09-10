@@ -33,6 +33,12 @@ class DbAPI
         return (int)$res['cnt'] > 0;
     }
 
+
+    public static function successSync()
+    {
+        self::exec("UPDATE nodes SET need_sync = 0");    
+    }
+
     public static function addNode($nodeArr)
     {
         self::exec(
@@ -46,7 +52,11 @@ class DbAPI
             sprintf("INSERT INTO nodes_ports (node_id, port_from, port_to, proto) VALUES(%s, %s, %s, '%s')",
                 (int)$nodeId, $from, $to, $proto)
         );
-//print_r($res);exit;
+	if(!$res) {
+		echo "\nPDO::errorInfo():\n";
+		print_r(self::$conn->errorInfo());
+		exit;
+	}
         self::exec(
             sprintf("UPDATE nodes SET need_sync = 1 WHERE id = %s", (int)$nodeId)
         );

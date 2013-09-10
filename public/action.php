@@ -3,7 +3,7 @@
 define('SITE_DIR', realpath(dirname(__FILE__).'/..'));
 require_once SITE_DIR .'/db-api.php';
 
-DbAPI::init(SITE_DIR.'/openvz-iptables.db');
+DbAPI::init(SITE_DIR.'/db/openvz-iptables.db');
 
 $params = json_decode(trim(file_get_contents('php://input')), true);
 /*

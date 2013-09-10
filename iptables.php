@@ -3,7 +3,7 @@
 define('SITE_DIR', dirname(__FILE__));
 require_once SITE_DIR .'/db-api.php';
 
-DbAPI::init(SITE_DIR.'/openvz-iptables.db');
+DbAPI::init(SITE_DIR.'/db/openvz-iptables.db');
 
 if(!DbAPI::needSync()) {
     exit(1);
@@ -27,8 +27,10 @@ foreach($portsFwd as $portFwd) {
 }
 file_put_contents(SITE_DIR.'/all', implode("\n", $str));
 
-// shell_exec(SITE_DIR.'/main');
+shell_exec(SITE_DIR.'/main');
 shell_exec('chmod 755 '.SITE_DIR.'/all');
-// shell_exec(SITE_DIR.'/all');
+shell_exec(SITE_DIR.'/all');
+
+DbAPI::successSync();
 
 exit('OK');
