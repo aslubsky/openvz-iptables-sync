@@ -4,9 +4,9 @@ define('SITE_DIR', dirname(__FILE__));
 require_once SITE_DIR .'/openvz-panel-api.php';
 require_once SITE_DIR .'/db-api.php';
 
-$user = 'admin';
-$password = 'gfhjkm666';
-$host = '144.76.91.146';
+$user = 'xxx';
+$password = 'xxx';
+$host = 'xxx.xxx.xxx.xxx';
 OpenVZPanelAPI::init($user, $password, $host);
 
 DbAPI::init(SITE_DIR.'/db/openvz-iptables.db');
